@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import Image from 'next/image'
 import { Hero, SearchBar, CustomFilter, CarCard, ShowMore } from '@/Components'
 import fetchCar from '@/utils';
@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 
 
 export default function Home() {
-  const [allCars, setAllcars] = useState([])
+  const [allCars, setAllCars] = useState([])
   const [loading, setLoading] = useState(false)
 
   const [manufacturer, setManufacturer] = useState('')
@@ -19,27 +19,27 @@ export default function Home() {
   const [limit, setLimit] = useState(10);
 
   const getCars = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const result = await fetchCar({
-        manufacturer: manufacturer || "",
+        manufacturer: manufacturer.toLowerCase() || "",
+        model: model.toLowerCase() || "",
+        fuel: fuel.toLowerCase() || "",
         year: year || 2022,
-        fuel: fuel || "",
         limit: limit || 10,
-        model: model || "",
       });
-    } catch (error) {
-      console.log(error);
 
+      setAllCars(result);
+    } catch {
+      console.error();
+    } finally {
+      setLoading(false);
     }
-    finally {
-      setLoading(false)
-    }
-  }
+  };
   useEffect(() => {
-    getCars()
+    getCars();
   }, [fuel, year, limit, manufacturer, model])
-  const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
+
   return (
     <main className="overflow-hidden">
       <Hero />
@@ -49,11 +49,11 @@ export default function Home() {
           <p>Explor the Cars you might like</p>
         </div>
         <div className="home__filters">
-          <SearchBar setManufacutrer={setManufacturer} />
+          <SearchBar setManufacturer={setManufacturer} setModel={setModel} />
         </div>
         <div className="home__filter-container">
-          <CustomFilter title='fuel' options={fuels} setFilter={setFuel} />
-          <CustomFilter title='year' options={yearsOfProduction} setFilter={setYear} />
+          <CustomFilter  options={fuels} setFilter={setFuel} />
+          <CustomFilter  options={yearsOfProduction} setFilter={setYear} />
         </div>
       </div>
 
@@ -61,30 +61,33 @@ export default function Home() {
         (
           <section className='px-[100px]'>
             <div className="home__cars-wrapper">
-              {allCars?.map((car) => (
-                <CarCard car={car} />
-              ))}
+              {allCars?.map((car, index) => (
+                <CarCard key={`car-${index}`} car={car} />
+              ))
+              }
             </div>
-            {loading&&(
+            {loading && (
               <div className="mt-16 w-full flex-center">
-                <Image 
-                src='/loader.svg'
-                alt='loader'
-                width={50}
-                height={50}
-                className='object-contain'/>
+                <Image
+                  src='/loader.svg'
+                  alt='loader'
+                  width={50}
+                  height={50}
+                  className='object-contain' />
               </div>
             )}
             <ShowMore
               pageNumber={limit / 10}
-              isNext={limit> allCars.length}
-              setLimt={setLimit} />
+              isNext={limit > allCars.length}
+              setLimit={setLimit} />
           </section>
         ) : (
-          <div className='home__error-container'>
-            <h2 className='text-black text-xl font-bold'>Oops. no results</h2>
-            <p>{allCars?.message}</p>
-          </div>
+          !loading && (
+            <div className='home__error-container'>
+              <h2 className='text-black text-xl font-bold'>Oops, no results</h2>
+              <p>{allCars?.message}</p>
+            </div>
+          )
         )}
     </main>
   )

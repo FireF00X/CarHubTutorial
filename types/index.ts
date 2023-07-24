@@ -27,6 +27,12 @@ export interface CarProps {
     transmission: string;
     year: number;
 }
+export type CarState = CarProps[] & { message?: string };
+
+export interface SearchBarProps {
+    setManufacturer: (manufacturer: string) => void;
+    setModel: (model: string) => void;
+}
 export interface FilterProps {
     manufacturer: string;
     year: number;
@@ -38,11 +44,16 @@ interface OptionProps {
     title: string;
     value: string;
 }
-export interface customFilterProps {
-    title: string;
-    options: OptionProps[]
+export interface CustomFilterProps<T> {
+    options: OptionProps[];
+    setFilter: (selected: T) => void;
 }
-export interface showMoreProps {
+export interface ShowMoreProps {
     pageNumber: number;
     isNext: boolean;
+    setLimit: (limit: number) => void;
+}
+export interface SearchManuFacturerProps {
+    selected: string;
+    setSelected: (selected: string) => void;
 }
